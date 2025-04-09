@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import './App.css'
+import {Outlet} from 'react-router-dom'
 
 function App() {
   return (
@@ -7,6 +7,9 @@ function App() {
       <div className='text-5xl font-bold underline'>
         Hello World
       </div>
+      <main>
+        <Outlet/>
+      </main>
     </>
   )
 }
