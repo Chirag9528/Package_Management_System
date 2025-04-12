@@ -1,27 +1,32 @@
 import { ShoppingCart, Package, Home, LogIn, ChevronDown, User } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import userContext from '../Context/userContext';
 
 const Navbar = () => {
   const [showLoginOptions, setShowLoginOptions] = useState(false);
   const [showUserOptions, setShowUserOptions] = useState(false);
-  const [isLoggedIn, setIsloggedIn] = useState(false);
-
+  // const [isLoggedIn, setIsloggedIn] = useState(false);
+  
   const navigate = useNavigate();
   const location = useLocation();
 
+  const {currUser,setcurrUser} = useContext(userContext);
+  const isLoggedIn = !!currUser;
+
   // Re-run on every route change
   useEffect(() => {
-    const status = localStorage.getItem('usertype');
-    setIsloggedIn(!!status);
+    // const status = localStorage.getItem('usertype');
+    // setIsloggedIn(!!status);
     setShowLoginOptions(false);
     setShowUserOptions(false);
   }, [location]);
 
   const handleLogout = () => {
     localStorage.clear();
-    setIsloggedIn(false);
+    // setIsloggedIn(false);            //not required 
     setShowUserOptions(false);
+    setcurrUser(null);
     navigate('/');
   };
 
@@ -93,6 +98,7 @@ const Navbar = () => {
                   </button>
                 </div>
               )}
+              
             </>
           )}
         </div>

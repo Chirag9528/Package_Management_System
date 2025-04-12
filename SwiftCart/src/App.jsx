@@ -1,6 +1,7 @@
 import './App.css'
 import {Outlet} from 'react-router-dom'
 import Navbar from './components/Navbar'
+import UserContextProvider from './Context/UserContextProvider'
 
 function App() {
   // const [orders, setOrders] = useState([]);
@@ -18,10 +19,10 @@ function App() {
   // };
   return (
     <>
-      <main>
+      <UserContextProvider>
         <Navbar />
         <Outlet/>
-      </main>
+      </UserContextProvider>
     </>
   )
 }

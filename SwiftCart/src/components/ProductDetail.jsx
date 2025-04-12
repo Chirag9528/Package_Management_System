@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { ShoppingCart, Star, TruckIcon, Shield, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import userContext from '../Context/userContext';
 
 const ProductDetail = ({ product}) => {
   console.log(product);
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
+  const {currUser} = useContext(userContext);
   
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
@@ -13,6 +15,42 @@ const ProductDetail = ({ product}) => {
       setQuantity(value);
     }
   };
+
+  const placeOrder = () =>{
+    console.log(product)
+    if(!currUser){
+      alert("Please Login to order item")
+      return 0;
+    }
+    console.log("welcome -- ",currUser);
+    console.log(currUser,product.item_id,quantity);
+    const placeOrder = async ()=>{
+      const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/c/place_orders`,{
+        method: 'POST',
+        credentials: "include",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body:  JSON.stringify({
+          email: currUser,
+          itemId: product.item_id,
+          itemQnty: quantity
+        })
+        
+      })
+      .then(response => response.json())
+      .catch(error => console.log(error))
+
+      if(response && response.success){
+        alert("Congratulation Your Order is placed")
+      }
+      else{
+        console.log("Your order is not placed");
+      }
+    }
+    placeOrder();
+    // setLoading()
+  }
   
   // const handleAddToCart = () => {
   //   onAddToCart({
@@ -90,6 +128,7 @@ const ProductDetail = ({ product}) => {
               </div>
               
               <button
+                onClick = {placeOrder}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center transition"
               >
                 <ShoppingCart size={20} className="mr-2" />

@@ -1,11 +1,14 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import userContext from '../Context/userContext';
 
 const LoginPage = () => {
   const { type } = useParams(); // 'customer' or 'employee'
   const [formData, setFormData] = useState({email: '', password: ''});
   const [error,seterror] = useState('');
   const navigate = useNavigate();
+
+  const {setcurrUser} = useContext(userContext);
 
   const handleChange = e => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,16 +30,41 @@ const LoginPage = () => {
 
         //may be can define some loader
 
-        localStorage.setItem('usertype', type);
+        // localStorage.setItem('usertype', type);
         // localStorage.setItem('username', formData.email);
         // localStorage.setItem('is_logged', true);
         // localStorage.setItem('userpassword', formData.password);
 
         if(type === 'customer') {
-            navigate('/customer/home')
+            setcurrUser(formData.email)
+            console.log("hello")
+            
+            const fetchitems = async ()=>{
+                const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/c/login`,{
+                    method: 'POST', 
+                    credentials: "include",
+                    headers: {
+                      "Content-Type": "application/json", 
+                    },
+                    body: JSON.stringify({
+                      email: formData.email,
+                      password: formData.password
+                    })
+                })
+                .then(response => response.json())
+                .catch(error => console.log(error))
+            
+                if (response && response.success){
+                    console.log("successfully login")
+                    navigate('/customer/home')
+                }
+            }
+            fetchitems();
+            
             // localStorage.clear()
         }
         else if(type === 'employee'){
+            setcurrUser('employee')
             navigate('/employee/home')
         }
 
