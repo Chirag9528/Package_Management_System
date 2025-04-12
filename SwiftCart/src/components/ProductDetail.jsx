@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { ShoppingCart, Star, TruckIcon, Shield, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const ProductDetail = ({ product, onAddToCart }) => {
+const ProductDetail = ({ product}) => {
+  console.log(product);
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
   
@@ -13,20 +14,20 @@ const ProductDetail = ({ product, onAddToCart }) => {
     }
   };
   
-  const handleAddToCart = () => {
-    onAddToCart({
-      productId: product.id,
-      quantity,
-      price: product.price,
-      name: product.name,
-      imageUrl: product.imageUrl
-    });
-    navigate('/orders');
-  };
+  // const handleAddToCart = () => {
+  //   onAddToCart({
+  //     productId: product.id,
+  //     quantity,
+  //     price: product.price,
+  //     name: product.name,
+  //     imageUrl: product.imageUrl
+  //   });
+  //   navigate('/orders');
+  // };
   
-  if (!product) {
-    return <div className="text-center py-12">Loading product details...</div>;
-  }
+  // if (!product) {
+  //   return <div className="text-center py-12">Loading product details...</div>;
+  // }
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -40,7 +41,7 @@ const ProductDetail = ({ product, onAddToCart }) => {
           {/* Product Image */}
           <div className="md:w-1/2 bg-gray-100 flex items-center justify-center p-6">
             <img 
-              src={product.imageUrl || "/api/placeholder/600/400"} 
+              src={product.imageUrl || import.meta.env.VITE_IMAGEURL} 
               alt={product.name} 
               className="max-w-full max-h-96 object-contain"
             />
@@ -48,37 +49,17 @@ const ProductDetail = ({ product, onAddToCart }) => {
           
           {/* Product Info */}
           <div className="md:w-1/2 p-6 md:p-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{product.name}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Item: &nbsp;{product.name}</h1>
             
             <div className="flex items-center mt-3">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    size={18} 
-                    fill={i < product.rating ? "gold" : "none"} 
-                    stroke={i < product.rating ? "gold" : "gray"}
-                    className="mr-1"
-                  />
-                ))}
-              </div>
-              <span className="text-sm text-gray-600 ml-2">({product.reviews} reviews)</span>
             </div>
             
             <div className="mt-4">
-              <span className="text-gray-800 text-3xl font-bold">${product.price.toFixed(2)}</span>
-              {product.oldPrice && (
-                <span className="text-gray-500 text-lg line-through ml-3">${product.oldPrice.toFixed(2)}</span>
-              )}
-              {product.discount > 0 && (
-                <span className="ml-3 bg-red-100 text-red-800 text-sm font-semibold px-2 py-1 rounded">
-                  Save {product.discount}%
-                </span>
-              )}
+              <span className="text-gray-800 text-3xl font-bold">Price: &nbsp; ${product.price}</span>
             </div>
             
             <div className="mt-6 border-t border-b border-gray-200 py-4">
-              <p className="text-gray-700 leading-relaxed">{product.description}</p>
+              <p className="text-gray-700 leading-relaxed">Description: &nbsp; {product.description}</p>
             </div>
             
             <div className="mt-6 flex flex-col space-y-3">
@@ -98,18 +79,17 @@ const ProductDetail = ({ product, onAddToCart }) => {
                   Quantity
                 </label>
                 <input
+                  onChange={(e)=>{setQuantity(e.target.value)}}
                   type="number"
                   id="quantity"
                   name="quantity"
                   min="1"
                   value={quantity}
-                  onChange={handleQuantityChange}
-                  className="border border-gray-300 rounded-md px-3 py-2 w-16 text-center"
+                  className="border border-gray-300 rounded-md px-3 py-2 w-16 text-center text-black"
                 />
               </div>
               
               <button
-                onClick={handleAddToCart}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center transition"
               >
                 <ShoppingCart size={20} className="mr-2" />

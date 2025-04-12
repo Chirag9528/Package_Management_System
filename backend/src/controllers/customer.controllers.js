@@ -144,7 +144,10 @@ const logoutCustomer = asyncHandler(async (req , res) => {
 
 const fetch_all_items = asyncHandler(async (req , res) => {
     await pool.query('SET ROLE TO customers');
-    const result = await pool.query('select * from item;')
+    const result = await pool.query(`
+        SELECT item_id , i.name as name, price , i.description , ci.name as category
+        FROM item i JOIN category_item ci 
+        ON i.category_id = ci.category_id;`)
     await pool.query('RESET ROLE;')
     return res
     .status(200)

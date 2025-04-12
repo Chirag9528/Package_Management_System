@@ -30,7 +30,7 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="text-xl font-bold flex items-center gap-2">
           <Package size={24} />
-          <span>PackageHub</span>
+          <span>SwiftCart</span>
         </Link>
 
         <div className="flex items-center gap-6 relative">

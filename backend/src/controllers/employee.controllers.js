@@ -77,7 +77,33 @@ const logoutEmployee = asyncHandler(async (req , res) => {
     .json(new ApiResponse(200 , {} , "User Logged Out"))
 })
 
+const get_all_pending_requests = asyncHandler(async (req , res) => {
+    const role = req.user.role;
+    const email = req.user.email;
+
+    const empQuery = `SELECT person_id FROM person WHERE email = $1`;
+    const empResult = await pool.query(empQuery, [email]);
+
+    if (empResult.rows.length === 0) {
+        throw new ApiError(404, "Employee not found");
+    }
+
+    await pool.query('SET ROLE employees;')
+    
+    const requestQuery = `SELECT * FROM get_pending_requests($1)`;
+    const requestResult = await pool.query(requestQuery, [empResult.rows[0].person_id]);
+
+    await pool.query('RESET ROLE');
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200 , requestResult.rows , "Pending requests fetched Successfully")
+    )
+})
+
 export {
     loginEmployee,
-    logoutEmployee
+    logoutEmployee,
+    get_all_pending_requests
 }
