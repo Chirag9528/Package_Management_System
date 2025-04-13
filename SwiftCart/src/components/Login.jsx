@@ -14,60 +14,59 @@ const LoginPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async (e)  => {
     e.preventDefault();
-    // handle login logic
     console.log(`Logging in as ${type}`, formData);
 
-    ///
     if(!formData.email || !formData.password){
         console.log(error)
         return seterror("Email and Password should not be empty")
     }
-
     try {
         seterror('');
-
-        //may be can define some loader
-
-        // localStorage.setItem('usertype', type);
-        // localStorage.setItem('username', formData.email);
-        // localStorage.setItem('is_logged', true);
-        // localStorage.setItem('userpassword', formData.password);
-
         if(type === 'customer') {
             setcurrUser(formData.email)
-            console.log("hello")
-            
-            const fetchitems = async ()=>{
-                const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/c/login`,{
-                    method: 'POST', 
-                    credentials: "include",
-                    headers: {
-                      "Content-Type": "application/json", 
-                    },
-                    body: JSON.stringify({
-                      email: formData.email,
-                      password: formData.password
-                    })
+            const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/c/login`,{
+                method: 'POST', 
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json", 
+                },
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password
                 })
-                .then(response => response.json())
-                .catch(error => console.log(error))
-            
-                if (response && response.success){
-                    console.log("successfully login")
-                    navigate('/customer/home')
-                }
+            })
+            .then(response => response.json())
+            .catch(error => console.log(error))
+        
+            if (response && response.success){
+                console.log("successfully login")
+                navigate('/customer/home')
             }
-            fetchitems();
-            
-            // localStorage.clear()
         }
         else if(type === 'employee'){
             setcurrUser('employee')
-            navigate('/employee/home')
+            const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/e/login`,{
+                method: 'POST', 
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json", 
+                },
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password
+                })
+            })
+            .then(response => response.json())
+            .catch(error => console.log(error))
+        
+            if (response && response.success){
+                console.log("successfully login")
+                navigate('/employee/home')
+            }
         }
-
+        
     } catch (err) {
         seterror('Failed to sign in. Please check your credentials.');
         console.error(err);
@@ -128,7 +127,7 @@ const LoginPage = () => {
                                 class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign in
                             </button>
                             <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                                Don’t have an account yet? <a href="#" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</a>
+                                Don't have an account yet? <a href="#" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</a>
                             </p>
                         </form>
                 </div>

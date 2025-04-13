@@ -8,13 +8,6 @@ const ProductDetail = ({ product}) => {
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
   const {currUser} = useContext(userContext);
-  
-  const handleQuantityChange = (e) => {
-    const value = parseInt(e.target.value);
-    if (value > 0) {
-      setQuantity(value);
-    }
-  };
 
   const placeOrder = () =>{
     console.log(product)
@@ -32,7 +25,6 @@ const ProductDetail = ({ product}) => {
           'Content-Type': 'application/json'
         },
         body:  JSON.stringify({
-          email: currUser,
           itemId: product.item_id,
           itemQnty: quantity
         })
@@ -52,20 +44,6 @@ const ProductDetail = ({ product}) => {
     // setLoading()
   }
   
-  // const handleAddToCart = () => {
-  //   onAddToCart({
-  //     productId: product.id,
-  //     quantity,
-  //     price: product.price,
-  //     name: product.name,
-  //     imageUrl: product.imageUrl
-  //   });
-  //   navigate('/orders');
-  // };
-  
-  // if (!product) {
-  //   return <div className="text-center py-12">Loading product details...</div>;
-  // }
   
   return (
     <div className="container mx-auto px-4 py-8">

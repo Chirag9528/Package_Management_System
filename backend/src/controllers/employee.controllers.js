@@ -61,22 +61,6 @@ const loginEmployee = asyncHandler(async (req , res) => {
     )
 })
 
-const logoutEmployee = asyncHandler(async (req , res) => {
-    const options = {
-        httpOnly : true,
-        secure : true
-    }
-
-    if (!(req.user.role === "employee")){
-        throw new ApiError(401 , "Invalid AccessToken")
-    }
-
-    return res
-    .status(200)
-    .clearCookie("accessToken" , options)
-    .json(new ApiResponse(200 , {} , "User Logged Out"))
-})
-
 const get_all_pending_requests = asyncHandler(async (req , res) => {
     const role = req.user.role;
     const email = req.user.email;
@@ -104,6 +88,5 @@ const get_all_pending_requests = asyncHandler(async (req , res) => {
 
 export {
     loginEmployee,
-    logoutEmployee,
     get_all_pending_requests
 }
