@@ -9,6 +9,9 @@ import OrdersPage from './pages/OrdersPage.jsx'
 import Login from './components/Login.jsx'
 import CustomerHome from './customer/Dashboard.jsx'
 import EmployeeHome from './employee/Dashboard.jsx'
+import PendingRequest from './employee/PendingRequest.jsx'
+import ProcessedRequest from './employee/ProcessedRequest.jsx'
+import ProcessOrder from './employee/ProcessOrder.jsx'
 
 const router = createBrowserRouter([
   {
@@ -37,7 +40,25 @@ const router = createBrowserRouter([
       },
       {
         path:"/employee/home",
-        element: <EmployeeHome/>
+        element: <EmployeeHome/>,
+        children: [
+          {
+            path: "/employee/home",
+            element: <PendingRequest/>
+          },
+          {
+            path : "/employee/home/processed_requests",
+            element: <ProcessedRequest/>
+          },
+          {
+            path : "/employee/home/pending_requests",
+            element: <PendingRequest/>
+          }
+        ]
+      },
+      {
+        path: "/process_order/:orderId",
+        element: <ProcessOrder/>
       }
     ]
   }

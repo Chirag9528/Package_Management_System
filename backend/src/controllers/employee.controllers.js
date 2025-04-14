@@ -86,7 +86,34 @@ const get_all_pending_requests = asyncHandler(async (req , res) => {
     )
 })
 
+const get_order_details = asyncHandler(async (req , res) => {
+    const orderId = req.params.orderId;
+    if (!orderId){
+        throw new ApiError(400 , "Order Id is required");
+    }
+
+    const client = await pool.connect();
+    let orderdetail;
+    try {
+        await client.query('BEGIN;');
+        orderdetail = await client.query(`SELECT * FROM get_order_details(${orderId});`)
+        await client.query('COMMIT;');
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
+    }
+    return res.
+    status(200)
+    .json(
+        new ApiResponse(200 , orderdetail.rows[0] , "Order Details Fetched Successfully")
+    )
+})
+
+
 export {
     loginEmployee,
-    get_all_pending_requests
+    get_all_pending_requests,
+    get_order_details
 }
