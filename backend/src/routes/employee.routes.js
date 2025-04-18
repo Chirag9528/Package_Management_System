@@ -6,8 +6,8 @@ import { authorizeRole } from '../middlewares/authRoles.middleware.js';
 
 const router  = Router()
 
-router.route("/login").post(loginEmployee);
-router.route("/get_all_pending_requests").get(verifyJWT , authorizeRole('employee') , get_all_pending_requests)
-router.route("/get_order_details/:orderId").get(verifyJWT , authorizeRole('employee') , get_order_details)
+router.route("/login").post(authorizeRole , loginEmployee);
+router.route("/get_all_pending_requests").get(verifyJWT , authorizeRole , get_all_pending_requests)
+router.route("/get_order_details/:orderId").get(verifyJWT , authorizeRole , get_order_details)
 
 export default router;

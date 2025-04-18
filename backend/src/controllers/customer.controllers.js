@@ -17,50 +17,41 @@ const registerCustomer = asyncHandler(async (req , res) => {
         throw new ApiError(400 , "All fields are required");
     }
 
-    const client = await pool.connect(); // get dedicated client
-    try {
-        await client.query('BEGIN');
+    let customerResult , userResult;
 
-        // Check if customer already exists
+    try {
+        await req.dbClient.query('BEGIN');
+
         const checkQuery = 'SELECT * FROM customer WHERE email = $1 OR phone_no = $2';
-        const checkResult = await client.query(checkQuery, [email, phone_no]);
+        const checkResult = await req.dbClient.query(checkQuery, [email, phone_no]);
 
         if (checkResult.rows.length > 0) {
             throw new ApiError(409, "Customer already exists with this email or phone number.");
         }
 
-        // Set role to customers
-        await client.query(`SET ROLE customers;`);
-
-        // Insert into customer table
         const insertCustomerQuery = `
             INSERT INTO customer (first_name, last_name, phone_no, email, city, state, pincode)
-            VALUES ($1, $2, $3, $4, $5, $6, $7);
+            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
         `;
-        await client.query(insertCustomerQuery, [
-            first_name, last_name, phone_no, email, city, state, pincode
-        ]);
 
-        await client.query(`RESET ROLE;`); // setting role to app_admin again
+        customerResult = await req.dbClient.query(insertCustomerQuery, [
+            first_name, last_name, phone_no, email, city, state, pincode ]);
         
         const hashedPassword = await bcrypt.hash(password, 10);
-        const customerResult = await client.query(`select * from customer where email = $1` , [email]);
         
         const insertUserQuery = `
-            INSERT INTO users (email, password, role)
-            VALUES ($1, $2, $3) RETURNING email , role;
+            INSERT INTO users (email, password, role , user_id)
+            VALUES ($1, $2, $3 , $4) RETURNING email , role , user_id;
         `;
-        const userResult = await client.query(insertUserQuery, [
-            email, hashedPassword, 'customer'
+        
+        userResult = await req.dbClient.query(insertUserQuery, [
+            email, hashedPassword, 'customer' , customerResult.rows[0].customer_id
         ]);
 
-        await client.query('COMMIT');
-
+        await req.dbClient.query('COMMIT');
     } catch (error) {
-        await client.query('ROLLBACK');
+        await req.dbClient.query('ROLLBACK');
         throw error;
-    } finally {
-        client.release();
     }
 
     return res.status(201).json(new ApiResponse(201, {
@@ -75,17 +66,18 @@ const loginCustomer = asyncHandler(async (req , res) => {
     if (!email || !password){
         throw new ApiError(400 , "Email and Password is required");
     }
-    let user;
-    const client = await pool.connect();
+    let user , custInfo;
+
     try {
-        await client.query('BEGIN');
-        const result = await client.query('SELECT * FROM users WHERE email = $1', [email])
+        await req.dbClient.query('BEGIN');
+        const result = await req.dbClient.query('SELECT * FROM users WHERE email = $1', [email])
     
         if (result.rowCount === 0) {
             throw new ApiError(401, "Email Id does not exists")
         }
     
         user = result.rows[0]
+
         if (!(user.role === "customer")){
             throw new ApiError(401 , "You are not a customer");
         }
@@ -95,18 +87,20 @@ const loginCustomer = asyncHandler(async (req , res) => {
         if (!isPasswordValid) {
             throw new ApiError(401, "Invalid credentials")
         }
-        await client.query('COMMIT;');
+
+        custInfo = await req.dbClient.query('Select * from customer where email = $1' , [email]);
+        
+        await req.dbClient.query('COMMIT;');
     } catch (error) {
-        await client.query('ROLLBACK');
+        await req.dbClient.query('ROLLBACK');
         throw error;
-    } finally {
-        client.release();
     }
 
     const token = jwt.sign(
         {
             email: user.email,
-            role: user.role
+            role: user.role,
+            id : user.user_id
         },
         process.env.ACCESSTOKENSECRET,
         {
@@ -127,7 +121,8 @@ const loginCustomer = asyncHandler(async (req , res) => {
         new ApiResponse(
             200,
             {
-                token
+                token,
+                custInfo : custInfo.rows[0]
             },
             "User logged In Successfully"
         )
@@ -136,12 +131,12 @@ const loginCustomer = asyncHandler(async (req , res) => {
 
 
 const fetch_all_items = asyncHandler(async (req , res) => {
-    await pool.query('SET ROLE TO customers');
-    const result = await pool.query(`
+
+    const result = await req.dbClient.query(`
         SELECT item_id , i.name as name, price , i.description , ci.name as category
         FROM item i JOIN category_item ci 
         ON i.category_id = ci.category_id;`)
-    await pool.query('RESET ROLE;')
+        
     return res
     .status(200)
     .json (
@@ -156,37 +151,25 @@ const fetch_all_items = asyncHandler(async (req , res) => {
 const place_orders = asyncHandler(async (req, res) => {
     const {itemId, itemQnty } = req.body;
     const email = req.user.email
-    
+    const customerId = req.user.id
+    console.log(customerId)
+
     if (!itemId || !itemQnty || !email) {
         throw new ApiError(400, "Item Id and Item Quantity is required");
     }
 
-    const client = await pool.connect();
     try {
-        await client.query('BEGIN');
+        await req.dbClient.query('BEGIN');
     
-        const cust_result = await client.query('SELECT customer_id FROM customer WHERE email = $1;',[email]);
-    
-        if (cust_result.rowCount === 0) {
-            throw new ApiError(501, "Internal Server Error");
-        }
-    
-        const customerId = cust_result.rows[0].customer_id;
-        
-        await client.query('SET ROLE customers;');
-    
-        const orderResult = await client.query(
+        const orderResult = await req.dbClient.query(
             `INSERT INTO orders (customer_id, item_id, status,ordered_qty)
              VALUES ($1, $2, 'pending',  $3);`,
             [customerId, itemId, itemQnty]
         );
-        await client.query('RESET ROLE;')
-        await client.query('COMMIT;');
+        await req.dbClient.query('COMMIT;');
     } catch (error) {
-        await client.query('ROLLBACK');
+        await req.dbClient.query('ROLLBACK');
         throw error;
-    } finally {
-        client.release();
     }
     
     return res

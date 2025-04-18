@@ -1,7 +1,7 @@
 import {asyncHandler} from './../utils/asyncHandler.js'
 import {ApiResponse} from './../utils/ApiResponse.js'
 
-const logoutUser = asyncHandler(async (req , res) => {
+const logoutUser = asyncHandler(async (_ , res) => {
     const options = {
         httpOnly : true,
         secure : true

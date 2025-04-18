@@ -17,8 +17,9 @@ export const verifyJWT = asyncHandler(async(req , _ , next) =>{
 
         const email = decodedToken.email
         const role = decodedToken.role
+        const id = decodedToken.id
         
-        req.user = {email , role};
+        req.user = {email , role , id};
         
         next();
     } catch (error) {
