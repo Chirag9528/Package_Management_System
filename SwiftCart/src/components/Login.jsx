@@ -41,6 +41,7 @@ const LoginPage = () => {
             .catch(error => console.log(error))
         
             if (response && response.success){
+                localStorage.setItem('username' , response.data.custInfo.first_name)
                 console.log("successfully login")
                 navigate('/customer/home')
             }
@@ -62,6 +63,7 @@ const LoginPage = () => {
             .catch(error => console.log(error))
         
             if (response && response.success){
+                localStorage.setItem('username' , response.data.employeeInfo.first_name)
                 console.log("successfully login")
                 navigate('/employee/home')
             }

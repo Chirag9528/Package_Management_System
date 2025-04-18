@@ -49,6 +49,7 @@ const Navbar = () => {
     .catch(error => console.log(error))
 
     if (response && response.success){
+        localStorage.removeItem('username')
         console.log("successfully logged out")
         setShowUserOptions(false);
         setcurrUser(null);
@@ -120,7 +121,7 @@ const Navbar = () => {
                 className="flex items-center gap-1 hover:text-blue-300 transition"
               >
                 <User size={18} />
-                <span>Account</span>
+                <span>{localStorage.getItem('username') ? localStorage.getItem('username') : "Account"}</span>
                 <ChevronDown size={14} />
               </button>
 

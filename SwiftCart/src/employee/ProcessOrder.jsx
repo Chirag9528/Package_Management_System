@@ -51,7 +51,31 @@ const ProcessOrder = () => {
       alert('Please enter a destination city');
       return;
     }
-    // logic to find transport vehicles
+    // logic to find transport vehicles (using dummy data till then)
+    setSearchPerformed(true)
+    setTransportOptions([
+      {
+        "transport_id" : 222,
+        "company_name" : "Tata",
+        "vehicle_type" : "Truck",
+        "departure_date" : "2025-04-18",
+        "estimated_arrival" : "2025-04-10",
+        "price" : 120,
+        "action" : "klkl"
+
+      },
+      {
+        "transport_id" : 222,
+        "company_name" : "Tata",
+        "vehicle_type" : "Truck",
+        "departure_date" : "2025-04-18",
+        "estimated_arrival" : "2025-04-10",
+        "price" : 120,
+        "action" : "klkl"
+
+      }
+
+    ])
     
   };
 
@@ -158,27 +182,27 @@ const ProcessOrder = () => {
             <h2 className="text-xl font-semibold mb-4 border-b pb-2">Available Transport Options</h2>
             {transportOptions.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-white">
+                <table className="min-w-full bg-white border border-black">
                   <thead>
                     <tr className="bg-gray-100">
-                      <th className="py-2 px-4 text-left">Transport ID</th>
-                      <th className="py-2 px-4 text-left">Company</th>
-                      <th className="py-2 px-4 text-left">Vehicle Type</th>
-                      <th className="py-2 px-4 text-left">Departure Date</th>
-                      <th className="py-2 px-4 text-left">Estimated Arrival</th>
-                      <th className="py-2 px-4 text-left">Price</th>
-                      <th className="py-2 px-4 text-left">Action</th>
+                      <th className="py-2 px-4 text-left text-black">Transport ID</th>
+                      <th className="py-2 px-4 text-left text-black">Company</th>
+                      <th className="py-2 px-4 text-left text-black">Vehicle Type</th>
+                      <th className="py-2 px-4 text-left text-black">Departure Date</th>
+                      <th className="py-2 px-4 text-left text-black">Estimated Arrival</th>
+                      <th className="py-2 px-4 text-left text-black">Price</th>
+                      <th className="py-2 px-4 text-left text-black">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {transportOptions.map((transport) => (
                       <tr key={transport.transport_id}>
-                        <td className="py-2 px-4 border-t">{transport.transport_id}</td>
-                        <td className="py-2 px-4 border-t">{transport.company_name}</td>
-                        <td className="py-2 px-4 border-t">{transport.vehicle_type}</td>
-                        <td className="py-2 px-4 border-t">{new Date(transport.departure_date).toLocaleString()}</td>
-                        <td className="py-2 px-4 border-t">{new Date(transport.estimated_arrival).toLocaleString()}</td>
-                        <td className="py-2 px-4 border-t">${transport.price.toFixed(2)}</td>
+                        <td className="py-2 px-4 border-t text-left text-black">{transport.transport_id}</td>
+                        <td className="py-2 px-4 border-t text-left text-black">{transport.company_name}</td>
+                        <td className="py-2 px-4 border-t text-left text-black">{transport.vehicle_type}</td>
+                        <td className="py-2 px-4 border-t text-left text-black">{new Date(transport.departure_date).toLocaleString()}</td>
+                        <td className="py-2 px-4 border-t text-left text-black">{new Date(transport.estimated_arrival).toLocaleString()}</td>
+                        <td className="py-2 px-4 border-t text-left text-black">${transport.price}</td>
                         <td className="py-2 px-4 border-t">
                           <button
                             onClick={() => selectTransport(transport.transport_id)}
