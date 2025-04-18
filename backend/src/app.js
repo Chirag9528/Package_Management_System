@@ -21,10 +21,12 @@ app.use(cookieParser())
 import customerRouter from './routes/customer.routes.js'
 import employeeRouter from './routes/employee.routes.js'
 import managerRouter from './routes/manager.routes.js'
+import userRouter from './routes/common.routes.js'
 
 // routes declaration
 app.use("/api/c" , customerRouter)
 app.use("/api/e" , employeeRouter)
 app.use("/api/m" , managerRouter)
+app.use("/api/u",userRouter)
 
 export default app;

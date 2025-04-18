@@ -129,21 +129,6 @@ const loginManager = asyncHandler(async (req , res) => {
     )
 })
 
-const logoutManager = asyncHandler(async (req , res) => {
-    const options = {
-        httpOnly : true,
-        secure : true
-    }
-
-    if (!(req.user.role === "manager")){
-        throw new ApiError(401 , "Invalid AccessToken")
-    }
-
-    return res
-    .status(200)
-    .clearCookie("accessToken" , options)
-    .json(new ApiResponse(200 , {} , "User Logged Out"))
-})
 
 const registerEmployee = asyncHandler(async (req , res) => {
     const {first_name , last_name , phone_no , email , city , state , pincode , password , shift_schedule , warehouse_id} = req.body
@@ -220,6 +205,5 @@ const registerEmployee = asyncHandler(async (req , res) => {
 export {
     registerManager,
     loginManager,
-    logoutManager,
     registerEmployee
 }

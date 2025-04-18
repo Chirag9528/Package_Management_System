@@ -6,7 +6,6 @@ import userContext from '../Context/userContext';
 const Navbar = () => {
   const [showLoginOptions, setShowLoginOptions] = useState(false);
   const [showUserOptions, setShowUserOptions] = useState(false);
-  // const [isLoggedIn, setIsloggedIn] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -14,20 +13,47 @@ const Navbar = () => {
   const {currUser,setcurrUser} = useContext(userContext);
   const isLoggedIn = !!currUser;
 
+  useEffect(()=>{
+    const checkuser = async ()=>{
+      const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/u/verify-accessToken`,{
+        method: 'POST', 
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json", 
+        }
+      })
+      .then(response => response.json())
+      .catch(error => console.log(error))
+      if (response && response.success){
+        setcurrUser(response.data.email)
+      }
+    }
+    checkuser();
+  })
+
   // Re-run on every route change
   useEffect(() => {
-    // const status = localStorage.getItem('usertype');
-    // setIsloggedIn(!!status);
     setShowLoginOptions(false);
     setShowUserOptions(false);
   }, [location]);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    // setIsloggedIn(false);            //not required 
-    setShowUserOptions(false);
-    setcurrUser(null);
-    navigate('/');
+  const handleLogout = async () => {
+    const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/u/logout`,{
+      method: 'POST', 
+      credentials: "include",
+      headers: {
+          "Content-Type": "application/json", 
+      }
+    })
+    .then(response => response.json())
+    .catch(error => console.log(error))
+
+    if (response && response.success){
+        console.log("successfully logged out")
+        setShowUserOptions(false);
+        setcurrUser(null);
+        navigate('/');
+    }
   };
 
   const handleMyOrders = () =>{

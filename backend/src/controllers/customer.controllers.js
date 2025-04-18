@@ -56,41 +56,51 @@ const registerCustomer = asyncHandler(async (req , res) => {
 
         await client.query('COMMIT');
 
-        return res.status(201).json(new ApiResponse(201, {
-            customer: customerResult.rows[0],
-            user: userResult.rows[0]
-        }, "Customer registered successfully!"));
     } catch (error) {
         await client.query('ROLLBACK');
         throw error;
     } finally {
         client.release();
     }
+
+    return res.status(201).json(new ApiResponse(201, {
+        customer: customerResult.rows[0],
+        user: userResult.rows[0]
+    }, "Customer registered successfully!"));
 })
 
 
 const loginCustomer = asyncHandler(async (req , res) => {
     const {email , password} = req.body
-    // console.log("========================")
     if (!email || !password){
         throw new ApiError(400 , "Email and Password is required");
     }
-
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email])
-
-    if (result.rowCount === 0) {
-        throw new ApiError(401, "Email Id does not exists")
-    }
-
-    const user = result.rows[0]
-    if (!(user.role === "customer")){
-        throw new ApiError(401 , "You are not a customer");
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password)
-
-    if (!isPasswordValid) {
-        throw new ApiError(401, "Invalid credentials")
+    let user;
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const result = await client.query('SELECT * FROM users WHERE email = $1', [email])
+    
+        if (result.rowCount === 0) {
+            throw new ApiError(401, "Email Id does not exists")
+        }
+    
+        user = result.rows[0]
+        if (!(user.role === "customer")){
+            throw new ApiError(401 , "You are not a customer");
+        }
+    
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+    
+        if (!isPasswordValid) {
+            throw new ApiError(401, "Invalid credentials")
+        }
+        await client.query('COMMIT;');
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
     }
 
     const token = jwt.sign(
@@ -125,23 +135,6 @@ const loginCustomer = asyncHandler(async (req , res) => {
 })
 
 
-const logoutCustomer = asyncHandler(async (req , res) => {
-    const options = {
-        httpOnly : true,
-        secure : true
-    }
-
-    if (!(req.user.role === "customer")){
-        throw new ApiError(401 , "Invalid AccessToken")
-    }
-
-    return res
-    .status(200)
-    .clearCookie("accessToken" , options)
-    .json(new ApiResponse(200 , {} , "User Logged Out"))
-})
-
-
 const fetch_all_items = asyncHandler(async (req , res) => {
     await pool.query('SET ROLE TO customers');
     const result = await pool.query(`
@@ -161,43 +154,55 @@ const fetch_all_items = asyncHandler(async (req , res) => {
 })
 
 const place_orders = asyncHandler(async (req, res) => {
-    const { email, itemId, itemQnty } = req.body;
-    console.log(email,itemId,itemQnty)
+    const {itemId, itemQnty } = req.body;
+    const email = req.user.email
+    
     if (!itemId || !itemQnty || !email) {
-        throw new ApiError(400, "Item, quantity, and email are required");
+        throw new ApiError(400, "Item Id and Item Quantity is required");
     }
 
-    // await pool.query('SET ROLE TO customers');
-
-    const cust_result = await pool.query(
-        'SELECT customer_id FROM customer WHERE email = $1',
-        [email]
-    );
-
-    if (cust_result.rowCount === 0) {
-        throw new ApiError(401, "User does not exist");
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+    
+        const cust_result = await client.query('SELECT customer_id FROM customer WHERE email = $1;',[email]);
+    
+        if (cust_result.rowCount === 0) {
+            throw new ApiError(501, "Internal Server Error");
+        }
+    
+        const customerId = cust_result.rows[0].customer_id;
+        
+        await client.query('SET ROLE customers;');
+    
+        const orderResult = await client.query(
+            `INSERT INTO orders (customer_id, item_id, status,ordered_qty)
+             VALUES ($1, $2, 'pending',  $3);`,
+            [customerId, itemId, itemQnty]
+        );
+        await client.query('RESET ROLE;')
+        await client.query('COMMIT;');
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
     }
-
-    const customerId = cust_result.rows[0].customer_id;
-    console.log("user id: ",customerId,email)
-    const orderResult = await pool.query(
-        `INSERT INTO orders (customer_id, item_id, status, return_date, delivered_date, ordered_qty)
-         VALUES ($1, $2, 'Pending', NULL, NULL, $3);`,
-        [customerId, itemId, itemQnty]
-    );
-
-    res.status(201).json({
-        success: true,
-        message: "Order placed successfully",
-        order: orderResult.rows[0]
-    });
+    
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200 , 
+                "Order placed successfully!"
+            )
+        )
 });
 
 
 export {
     registerCustomer,
     loginCustomer,
-    logoutCustomer,
     fetch_all_items,
     place_orders
 }
