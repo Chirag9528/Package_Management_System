@@ -9,6 +9,10 @@ import OrdersPage from './pages/OrdersPage.jsx'
 import Login from './components/Login.jsx'
 import CustomerHome from './customer/Dashboard.jsx'
 import EmployeeHome from './employee/Dashboard.jsx'
+import MyOrders from './customer/MyOrders.jsx'
+import PendingRequest from './employee/PendingRequest.jsx'
+import ProcessedRequest from './employee/ProcessedRequest.jsx'
+import ProcessOrder from './employee/ProcessOrder.jsx'
 
 const router = createBrowserRouter([
   {
