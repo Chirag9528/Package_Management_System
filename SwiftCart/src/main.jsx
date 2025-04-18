@@ -9,6 +9,7 @@ import OrdersPage from './pages/OrdersPage.jsx'
 import Login from './components/Login.jsx'
 import CustomerHome from './customer/Dashboard.jsx'
 import EmployeeHome from './employee/Dashboard.jsx'
+import MyOrders from './customer/MyOrders.jsx'
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
       {
         path:"/customer/home",
         element: <CustomerHome/>
+      },
+      {
+        path:"/customer/myorder",
+        element: <MyOrders/>
       },
       {
         path:"/employee/home",

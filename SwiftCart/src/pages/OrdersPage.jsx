@@ -69,16 +69,19 @@ const OrdersPage = ({ orders: propOrders }) => {
     }, 500);
     
     // In real app, fetch from your backend
-    // fetch('/api/orders')
-    //   .then(res => res.json())
-    //   .then(data => {
-    //     setOrders(data);
-    //     setLoading(false);
-    //   })
-    //   .catch(err => {
-    //     console.error('Error fetching orders:', err);
-    //     setLoading(false);
-    //   });
+    const fetchorders = async ()=>{
+      const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/c/get_all_orders`,{
+        method: 'GET',
+        credentials: "include"
+      })
+      .then(response => response.json())
+      .catch(error => console.log(error))
+
+      if(response && response.succces){
+        console.log("successfully fetched all item")
+      }
+    }
+    fetchorders();
   }, [propOrders]);
   
   return (

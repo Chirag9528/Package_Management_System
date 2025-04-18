@@ -30,6 +30,14 @@ const Navbar = () => {
     navigate('/');
   };
 
+  const handleMyOrders = () =>{
+    if(!currUser){
+      alert("please login to see your orders")
+      return;
+    }
+    navigate('/orders')
+  }
+
   return (
     <nav className="bg-slate-800 text-white p-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
@@ -44,10 +52,12 @@ const Navbar = () => {
             <span>Home</span>
           </Link>
 
-          <Link to="/orders" className="flex items-center gap-1 hover:text-blue-300 transition">
+          <button 
+            onClick={handleMyOrders}
+          className="flex items-center gap-1 hover:text-blue-300 transition">
             <ShoppingCart size={18} />
             <span>My Orders</span>
-          </Link>
+          </button>
 
           {!isLoggedIn ? (
             <>
@@ -98,7 +108,6 @@ const Navbar = () => {
                   </button>
                 </div>
               )}
-              
             </>
           )}
         </div>
