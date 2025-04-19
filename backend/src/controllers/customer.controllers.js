@@ -183,9 +183,23 @@ const place_orders = asyncHandler(async (req, res) => {
 });
 
 
+const get_my_orders = asyncHandler(async (req , res) => {
+    const ordersResult = await req.dbClient.query(`SELECT * FROM get_my_orders(${req.user.id})`)
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200 , 
+            ordersResult.rows,
+            "My orders fetched successfully"
+        )
+    ) 
+})
+
 export {
     registerCustomer,
     loginCustomer,
     fetch_all_items,
-    place_orders
+    place_orders,
+    get_my_orders
 }
