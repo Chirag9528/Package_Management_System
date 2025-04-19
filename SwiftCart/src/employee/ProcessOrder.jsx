@@ -7,7 +7,6 @@ const ProcessOrder = () => {
 
   const { orderId } = useParams();
   const { obj } = location.state
-  console.log(obj)
   
   const [orderDetails, setOrderDetails] = useState(null);
   
@@ -51,36 +50,59 @@ const ProcessOrder = () => {
       alert('Please enter a destination city');
       return;
     }
-    // logic to find transport vehicles (using dummy data till then)
-    setSearchPerformed(true)
-    setTransportOptions([
-      {
-        "transport_id" : 222,
-        "company_name" : "Tata",
-        "vehicle_type" : "Truck",
-        "departure_date" : "2025-04-18",
-        "estimated_arrival" : "2025-04-10",
-        "price" : 120,
-        "action" : "klkl"
-
-      },
-      {
-        "transport_id" : 222,
-        "company_name" : "Tata",
-        "vehicle_type" : "Truck",
-        "departure_date" : "2025-04-18",
-        "estimated_arrival" : "2025-04-10",
-        "price" : 120,
-        "action" : "klkl"
-
+    try {
+      const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/e/get_available_transport`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          warehouse_id: obj.w_house_id,
+          destination_city: destinationCity
+        })
+      });
+    
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
       }
-
-    ])
+    
+      const data = await response.json();
+      console.log('Available transport:', data);
+      setSearchPerformed(true)
+      setTransportOptions(data.data)
+    
+    } catch (error) {
+      console.error('Error fetching transport:', error);
+    }
     
   };
 
   const selectTransport = async (transportId) => {
     // logic to process order
+    const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/e/process_order`,{
+      method : 'POST',
+      credentials : 'include',
+      headers: {
+        'Content-Type' : 'application/json'
+      },
+      body: JSON.stringify({
+        transport_id : transportId,
+        order_id : obj.ord_id,
+        warehouse_id : obj.w_house_id,
+        item_id : orderDetails.itm_id,
+        destination_city : orderDetails.cty,
+        unit_price : obj.cost,
+        ord_qty : orderDetails.ord_qty
+      })
+    })
+    .then(response => response.json())
+    .catch(error => console.log(error))
+    if (response && response.success){
+      alert("OrderRequest Processed Successfully");
+      navigate("/employee/home/pending_requests");
+    }
+
   };
 
   if (loading) {
@@ -186,27 +208,28 @@ const ProcessOrder = () => {
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="py-2 px-4 text-left text-black">Transport ID</th>
-                      <th className="py-2 px-4 text-left text-black">Company</th>
-                      <th className="py-2 px-4 text-left text-black">Vehicle Type</th>
-                      <th className="py-2 px-4 text-left text-black">Departure Date</th>
-                      <th className="py-2 px-4 text-left text-black">Estimated Arrival</th>
+                      <th className="py-2 px-4 text-left text-black">Driver Name</th>
+                      <th className="py-2 px-4 text-left text-black">Vehicle Number</th>
+                      <th className="py-2 px-4 text-left text-black">Departure Time</th>
                       <th className="py-2 px-4 text-left text-black">Price</th>
+                      <th className="py-2 px-4 text-left text-black">Status</th>
                       <th className="py-2 px-4 text-left text-black">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {transportOptions.map((transport) => (
                       <tr key={transport.transport_id}>
-                        <td className="py-2 px-4 border-t text-left text-black">{transport.transport_id}</td>
-                        <td className="py-2 px-4 border-t text-left text-black">{transport.company_name}</td>
-                        <td className="py-2 px-4 border-t text-left text-black">{transport.vehicle_type}</td>
-                        <td className="py-2 px-4 border-t text-left text-black">{new Date(transport.departure_date).toLocaleString()}</td>
-                        <td className="py-2 px-4 border-t text-left text-black">{new Date(transport.estimated_arrival).toLocaleString()}</td>
-                        <td className="py-2 px-4 border-t text-left text-black">${transport.price}</td>
+                        <td className="py-2 px-4 text-left text-black">{transport.transport_id}</td>
+                        <td className="py-2 px-4 text-left text-black">{transport.driver_name}</td>
+                        <td className="py-2 px-4 text-left text-black">{transport.vehicle_no}</td>
+                        <td className="py-2 px-4 text-left text-black">{transport.departure_time}</td>
+                        <td className="py-2 px-4 text-left text-black">0</td>
+                        <td className={`py-2 px-4 text-left ${transport.availability === "available" ? "text-green-500" : "text-red-500"}`}>{transport.availability}</td>
                         <td className="py-2 px-4 border-t">
                           <button
+                            disabled={transport.availability === "unavailable"}
                             onClick={() => selectTransport(transport.transport_id)}
-                            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+                            className={`text-white px-3 py-1 rounded ${transport.availability === "unavailable" ? "bg-red-300" : "bg-green-600 hover:bg-green-700"} transition`}
                           >
                             Ship
                           </button>

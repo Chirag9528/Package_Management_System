@@ -103,8 +103,54 @@ const get_order_details = asyncHandler(async (req , res) => {
 })
 
 
+const get_available_transport = asyncHandler(async (req , res) => {
+    const {warehouse_id , destination_city} = req.body;
+
+    const transport_options = `
+        SELECT * FROM transport WHERE
+        warehouse_id = $1 AND destination_city = $2;
+    `;
+    const result = await req.dbClient.query(transport_options , [warehouse_id , destination_city]);
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200 , 
+            result.rows,
+            "all available transport fetched successfully!"
+        )
+    )
+})
+
+const process_order = asyncHandler(async (req , res) => {
+    const {transport_id , order_id , warehouse_id , item_id , destination_city , unit_price , ord_qty} = req.body;
+    if (!transport_id || !order_id || !warehouse_id || !item_id || !unit_price  || !ord_qty || !destination_city){
+        throw new ApiError(400 , "All fields are required!");
+    }
+
+    const result = await req.dbClient.query('Select 1;')
+    // After running this , then procedure works find 
+    // need to look later
+
+    await req.dbClient.query(`CALL process_order_request($1 , $2 , $3 , $4 , $5 , $6 , $7 , $8);` , [
+        transport_id , order_id , warehouse_id , item_id , destination_city , unit_price*ord_qty , ord_qty , req.user.id
+    ])
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200 ,
+            {},
+            "Order_Request Processed Successfully!"
+        )
+    )
+})
+
 export {
     loginEmployee,
     get_all_pending_requests,
-    get_order_details
+    get_order_details,
+    get_available_transport,
+    process_order
 }
