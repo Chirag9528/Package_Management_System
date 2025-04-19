@@ -3,7 +3,7 @@ import { useContext, useState } from 'react';
 import userContext from '../Context/userContext';
 
 const LoginPage = () => {
-  const { type } = useParams(); // 'customer' or 'employee'
+  const { type } = useParams(); // 'customer' or 'employee' or 'manager'
   const [formData, setFormData] = useState({email: '', password: ''});
   const [error,seterror] = useState('');
   const navigate = useNavigate();
@@ -23,6 +23,7 @@ const LoginPage = () => {
         return seterror("Email and Password should not be empty")
     }
     try {
+        console.log(type)
         seterror('');
         if(type === 'customer') {
             setcurrUser(formData.email)
@@ -66,6 +67,30 @@ const LoginPage = () => {
                 localStorage.setItem('username' , response.data.employeeInfo.first_name)
                 console.log("successfully login")
                 navigate('/employee/home')
+            }
+        }
+        else if(type === 'manager'){
+            setcurrUser('manager')
+            const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/m/login`,{
+                method: 'POST', 
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json", 
+                },
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password
+                })
+            })
+            .then(response => response.json())
+            .catch(error => console.log(error))
+        
+            if (response && response.success){
+                localStorage.setItem('username' , response.data.managerInfo.first_name)
+                localStorage.setItem('id' , response.data.managerInfo.person_id)
+                console.log("successfully login")
+                console.log(response)
+                navigate('/manager/home')
             }
         }
         

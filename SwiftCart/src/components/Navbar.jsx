@@ -111,6 +111,12 @@ const Navbar = () => {
                   >
                     Login as Employee
                   </Link>
+                  <Link
+                    to="/login/manager"
+                    className="block px-4 py-2 hover:bg-slate-100"
+                  >
+                    Login as Manager
+                  </Link>
                 </div>
               )}
             </>

@@ -27,6 +27,6 @@ import userRouter from './routes/common.routes.js'
 app.use("/api/c" , customerRouter)
 app.use("/api/e" , employeeRouter)
 app.use("/api/m" , managerRouter)
-app.use("/api/u",userRouter)
+app.use("/api/u", userRouter)
 
 export default app;

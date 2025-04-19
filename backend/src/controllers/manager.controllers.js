@@ -204,8 +204,60 @@ const registerEmployee = asyncHandler(async (req , res) => {
     }
 })
 
+const get_all_stocks = asyncHandler( async(req, res) => {
+        const managerId = req.query.managerId;
+        if (!managerId) {
+            throw new ApiError(400, "Manager ID is required in query params.");
+        }
+
+        // const r = await req.dbClient.query(
+        //     `SELECT current_user;`
+        // );   
+        // console.log("current user ",r.rows[0])
+        const result = await req.dbClient.query(
+            `SELECT warehouse_id FROM manager WHERE person_id = $1`, [managerId]
+        );        
+          
+        const w_id = result.rows[0]?.warehouse_id;
+      
+        if (!w_id) {
+        throw new ApiError(404, "Manager is not associated with any warehouse");
+        }
+          
+        const data = await req.dbClient.query(`
+            SELECT * FROM warehouse AS w
+            JOIN contain AS c ON c.w_house_id = w.warehouse_id
+            JOIN item AS i ON i.item_id = c.item_id
+            WHERE w.warehouse_id = $1
+        `, [w_id]);
+        
+
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(200 , data.rows , "All stocks fetched Successfully")
+        )
+    }
+)
+
+const get_low_stocks = asyncHandler( async(req,res)=>{
+    const managerId = req.query.managerId;
+    if(!managerId){
+        throw new ApiError(400, "Manager ID is required in query params.");
+    }
+    const data = await req.dbClient.query(`SELECT * FROM check_low_stock($1)`,[managerId])
+   
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200 , data.rows , "All stocks fetched Successfully")
+    )
+})
+
 export {
     registerManager,
     loginManager,
-    registerEmployee
+    registerEmployee,
+    get_all_stocks,
+    get_low_stocks
 }
