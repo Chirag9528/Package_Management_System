@@ -254,10 +254,36 @@ const get_low_stocks = asyncHandler( async(req,res)=>{
     )
 })
 
+const get_all_availble_stocks_warehouse = asyncHandler( async (req,res)=>{
+    const managerId = req.query.managerId;
+    const item_id = req.query.itemId;
+   
+    if(!managerId || !item_id){
+        throw new ApiError(400, "Manager ID is required in query params.");
+    }
+    const result = await req.dbClient.query(
+        `SELECT warehouse_id FROM manager WHERE person_id = $1;`, [managerId]
+    );        
+      
+    const w_id = result.rows[0]?.warehouse_id;
+
+    const data = await req.dbClient.query(
+        `SELECT * FROM search_warehouse_with_available_stocks($1,$2);`,[item_id,w_id]
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200,data.rows,"All available warehouse for stock fetched")
+        )
+
+})
+
 export {
     registerManager,
     loginManager,
     registerEmployee,
     get_all_stocks,
-    get_low_stocks
+    get_low_stocks,
+    get_all_availble_stocks_warehouse
 }

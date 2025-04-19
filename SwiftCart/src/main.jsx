@@ -16,6 +16,7 @@ import ProcessOrder from './employee/ProcessOrder.jsx'
 import ManagerDashboard from './manager/home.jsx'
 import AllStocks from './manager/AllStocks.jsx'
 import MinimumStocks from './manager/MinimumStocks.jsx'
+import Process_Request from './manager/Process_Request.jsx'
 
 const router = createBrowserRouter([
   {
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
             element:<MinimumStocks/>
           }
         ]
+      },
+      {
+        path:"/manager/home/stocks_required/:stock_id",
+        element: <Process_Request/>
       },
       {
         path: "/process_order/:orderId",
