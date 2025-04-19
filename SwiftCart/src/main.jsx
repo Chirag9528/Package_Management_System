@@ -17,6 +17,7 @@ import ManagerDashboard from './manager/home.jsx'
 import AllStocks from './manager/AllStocks.jsx'
 import MinimumStocks from './manager/MinimumStocks.jsx'
 import Process_Request from './manager/Process_Request.jsx'
+import PendingStocksRequests from './manager/PendingStocksRequest.jsx'
 
 const router = createBrowserRouter([
   {
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
           {
             path: "stocks_required", 
             element:<MinimumStocks/>
+          },
+          {
+            path: "pending_requests", 
+            element:<PendingStocksRequests/>
           }
         ]
       },

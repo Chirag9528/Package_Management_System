@@ -1,11 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
 const ManagerDashboard = () => {
   const navigate = useNavigate();  
+  const location = useLocation();
+
   const [activeTab, setActiveTab] = useState('pending');
   const [allstock, setallstock] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Sync tab with URL
+    if (location.pathname.includes('all_stocks')) {
+      setActiveTab('pending');
+    } else if (location.pathname.includes('stocks_required')) {
+      setActiveTab('processed');
+    } else if (location.pathname.includes('pending_requests')) {
+      setActiveTab('pending_requests');
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const fetchitem = async () => {
@@ -54,6 +67,7 @@ const ManagerDashboard = () => {
             📊 Manager Dashboard
           </h1>
 
+          {/* Tabs */}
           <div className="flex justify-center mb-8">
             <div className="inline-flex gap-4 bg-indigo-100 p-2 rounded-full shadow-inner">
               <button
@@ -83,9 +97,24 @@ const ManagerDashboard = () => {
               >
                 Minimum Stocks
               </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('pending_requests');
+                  navigate('/manager/home/pending_requests');
+                }}
+                className={`px-6 py-2 text-sm font-medium rounded-full transition duration-300 ${
+                  activeTab === 'pending_requests'
+                    ? 'bg-indigo-600 text-white shadow'
+                    : 'text-indigo-700 hover:bg-indigo-200'
+                }`}
+              >
+                Pending Requests
+              </button>
             </div>
           </div>
 
+          {/* Main Content */}
           <main className="mt-4">
             <Outlet context={{ allstock }} />
           </main>

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+// import { place_orders } from '../../../backend/src/controllers/customer.controllers';
 
 export default function Process_Request() {
     const location = useLocation();
     const item = location.state?.itemState;
+    const [placedRequests, setPlacedRequests] = useState(new Set());
+
 
     const [available, setAvailable] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -44,6 +47,43 @@ export default function Process_Request() {
 
         fetchAllAvailable();
     };
+
+    const placeOrderStocks = (entry) =>{
+        const id = localStorage.getItem('id');
+        const place_request = async()=>{
+            setLoading(true);
+            try {
+                const res = await fetch(
+                    `${import.meta.env.VITE_HOSTNAME}/api/m/place_stock_request?managerId=${id}&itemId=${item.itm_id}&w_id=${entry.wid}`,
+                    {
+                        method: 'GET',
+                        credentials: 'include',
+                    }
+                );
+
+                const text = await res.text();
+                try {
+                    const response = JSON.parse(text);
+                    console.log("Parsed response:", response);
+
+                    if (response.success) {
+                        alert("request placed")
+                       console.log("SUCCESS")
+                       setPlacedRequests(prev => new Set([...prev, entry.wid]));
+                    } else {
+                        console.log("Response.success is false");
+                    }
+                } catch (err) {
+                    console.error("Could not parse JSON:", err);
+                }
+            } catch (err) {
+                console.log("Data cannot be fetched", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        place_request()
+    }
 
     if (!item) {
         return <div className="text-center p-6 text-red-500">No item data received.</div>;
@@ -93,9 +133,18 @@ export default function Process_Request() {
                                     <td className="px-4 py-2 border">{entry.distance} km</td>
                                     <td className="px-4 py-2 border">{entry.currentstock}</td>
                                     <td className="px-4 py-2 border">
-                                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition">
-                                            Request
-                                        </button>
+                                    <button
+                                        onClick={() => placeOrderStocks(entry)}
+                                        disabled={placedRequests.has(entry.wid)}
+                                        className={`px-4 py-2 rounded-full transition ${
+                                            placedRequests.has(entry.wid)
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                        }`}
+                                    >
+                                        {placedRequests.has(entry.wid) ? 'Placed ' : 'Request'}
+                                    </button>
+
                                     </td>
                                 </tr>
                             ))}

@@ -279,11 +279,53 @@ const get_all_availble_stocks_warehouse = asyncHandler( async (req,res)=>{
 
 })
 
+const place_request = asyncHandler( async(req,res)=>{
+    const managerId = req.query.managerId;
+    const item_id = req.query.itemId;
+    const fromW_id = req.query.w_id;
+
+    if(!managerId || !item_id || !fromW_id){
+        throw new ApiError(400, "Manager ID is required in query params.");
+    }
+
+    await req.dbClient.query(
+        `CALL create_pending_stock_request($1, $2, $3);`, [managerId,item_id,fromW_id]
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200,"All available warehouse for stock fetched")
+        )
+
+})
+
+const get_all_stocks_pend_request = asyncHandler(async (req,res) =>{
+    const managerId = req.query.managerId;
+
+    if(!managerId ){
+        throw new ApiError(400, "Manager ID is required in query params.");
+    }
+
+    const data = await req.dbClient.query(
+        `SELECT * FROM get_pending_requests_by_manager($1);`,[managerId]
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200,data.rows,"All available warehouse for stock fetched")
+        )
+
+})
+
 export {
     registerManager,
     loginManager,
     registerEmployee,
     get_all_stocks,
     get_low_stocks,
-    get_all_availble_stocks_warehouse
+    get_all_availble_stocks_warehouse,
+    place_request,
+    get_all_stocks_pend_request
 }
