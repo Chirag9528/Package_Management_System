@@ -72,11 +72,11 @@ const ManagerDashboard = () => {
             <div className="inline-flex gap-4 bg-indigo-100 p-2 rounded-full shadow-inner">
               <button
                 onClick={() => {
-                  setActiveTab('pending');
+                  setActiveTab('all_stocks');
                   navigate('/manager/home/all_stocks');
                 }}
                 className={`px-6 py-2 text-sm font-medium rounded-full transition duration-300 ${
-                  activeTab === 'pending'
+                  activeTab === 'all_stocks'
                     ? 'bg-indigo-600 text-white shadow'
                     : 'text-indigo-700 hover:bg-indigo-200'
                 }`}
@@ -86,11 +86,11 @@ const ManagerDashboard = () => {
 
               <button
                 onClick={() => {
-                  setActiveTab('processed');
+                  setActiveTab('stocks_required');
                   navigate('/manager/home/stocks_required');
                 }}
                 className={`px-6 py-2 text-sm font-medium rounded-full transition duration-300 ${
-                  activeTab === 'processed'
+                  activeTab === 'stocks_required'
                     ? 'bg-indigo-600 text-white shadow'
                     : 'text-indigo-700 hover:bg-indigo-200'
                 }`}
@@ -100,19 +100,34 @@ const ManagerDashboard = () => {
 
               <button
                 onClick={() => {
-                  setActiveTab('pending_requests');
-                  navigate('/manager/home/pending_requests');
+                  setActiveTab('in_pending_requests');
+                  navigate('/manager/home/in_pending_requests');
                 }}
                 className={`px-6 py-2 text-sm font-medium rounded-full transition duration-300 ${
-                  activeTab === 'pending_requests'
+                  activeTab === 'in_pending_requests'
                     ? 'bg-indigo-600 text-white shadow'
                     : 'text-indigo-700 hover:bg-indigo-200'
                 }`}
               >
-                Pending Requests
+                Incoming Pending Requests
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('out_pending_requests');
+                  navigate('/manager/home/out_pending_requests');
+                }}
+                className={`px-6 py-2 text-sm font-medium rounded-full transition duration-300 ${
+                  activeTab === 'out_pending_requests'
+                    ? 'bg-indigo-600 text-white shadow'
+                    : 'text-indigo-700 hover:bg-indigo-200'
+                }`}
+              >
+                Outgoing Pending Requests
               </button>
             </div>
           </div>
+
 
           {/* Main Content */}
           <main className="mt-4">

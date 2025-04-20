@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { loginManager, registerEmployee, registerManager, get_all_stocks, get_low_stocks, get_all_availble_stocks_warehouse, place_request , get_all_stocks_pend_request} from '../controllers/manager.controllers.js';
+import { loginManager, registerEmployee, registerManager, get_all_stocks, get_low_stocks, get_all_availble_stocks_warehouse, place_request , get_all_stocks_pend_request, get_all_stocks_pend_out_request} from '../controllers/manager.controllers.js';
 
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { authorizeRole } from '../middlewares/authRoles.middleware.js';
@@ -14,5 +14,7 @@ router.route("/get_low_stocks").get(verifyJWT, authorizeRole, get_low_stocks)
 router.route("/get_all_available_searchStocks").get(verifyJWT, authorizeRole, get_all_availble_stocks_warehouse)
 router.route("/place_stock_request").get(verifyJWT,authorizeRole,place_request)
 router.route("/get_pending_stock_requests").get(verifyJWT,authorizeRole,get_all_stocks_pend_request)
+router.route("/get_pending_stock_outrequests").get(verifyJWT,authorizeRole, get_all_stocks_pend_out_request)
+
 
 export default router;

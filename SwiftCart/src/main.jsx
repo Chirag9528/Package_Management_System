@@ -18,6 +18,7 @@ import AllStocks from './manager/AllStocks.jsx'
 import MinimumStocks from './manager/MinimumStocks.jsx'
 import Process_Request from './manager/Process_Request.jsx'
 import PendingStocksRequests from './manager/PendingStocksRequest.jsx'
+import Posted_Stocks_Order from './manager/Posted_Stocks_Order.jsx'
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
         element: <ManagerDashboard/>,
         children: [
           {
+            path: "", 
+            element: <AllStocks/>
+          },
+          {
             path: "all_stocks", 
             element: <AllStocks/>
           },
@@ -79,8 +84,13 @@ const router = createBrowserRouter([
             element:<MinimumStocks/>
           },
           {
-            path: "pending_requests", 
-            element:<PendingStocksRequests/>
+            path: "out_pending_requests", 
+            element:<Posted_Stocks_Order/>
+          },
+          {
+            path:"in_pending_requests",
+            element: <PendingStocksRequests/>
+            
           }
         ]
       },
