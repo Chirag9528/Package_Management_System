@@ -18,6 +18,7 @@ const Posted_Stocks_Order = () => {
 
         const data = await response.json();
         if (data.success) {
+          console.log(data.data);
           setRequests(data.data);
         } else {
           console.error("Error from backend:", data.message);
@@ -62,13 +63,13 @@ const Posted_Stocks_Order = () => {
             📦 Item: {req.itm_id}
           </h2>
           <p className="text-sm text-gray-600 mb-1">
-            🧑 Requested by: <span className="font-medium">{req.from_warehouse_id}</span>
+            🧑 Requested to: <span className="font-medium">{req.to_warehouse_id}</span>
           </p>
           <p className="text-sm text-gray-600 mb-1">
-            🔢 Quantity: <span className="font-medium">{req.stocks_required}</span>
+            🔢 Quantity Required: <span className="font-medium">{req.stocks_required}</span>
           </p>
           <p className="text-sm text-gray-600 mb-3">
-            ⏳ Status: <span className="text-yellow-600 font-semibold">Pending</span>
+            ⏳ Status: <span className="text-yellow-600 font-semibold">{req.status}</span>
           </p>
          
         </div>

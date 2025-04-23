@@ -4,6 +4,7 @@ const PendingStocksRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     const fetchPendingRequests = async () => {
       try {
