@@ -336,6 +336,30 @@ const get_all_stocks_pend_out_request = asyncHandler(async(req,res)=>{
         )
 })
 
+const add_check_list = asyncHandler(async(req,res)=>{
+    const managerId = req.query.managerId;
+    const item_id = req.query.itemId;
+
+    if(!managerId ){
+        throw new ApiError(400, "Manager ID is required in query params.");
+    }
+    const result = await req.dbClient.query(
+        `SELECT warehouse_id FROM manager WHERE person_id = $1;`, [managerId]
+    );        
+      
+    const w_id = result.rows[0]?.warehouse_id;
+
+    const data = await req.dbClient.query(
+        `UPDATE contain SET min_stock = curr_stock+1 WHERE item_id = $1 AND w_house_id = $2`,[item_id,w_id]
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200,data.rows,"Manager added the stock to min stock")
+        )
+})
+
 export {
     registerManager,
     loginManager,
@@ -345,5 +369,6 @@ export {
     get_all_availble_stocks_warehouse,
     place_request,
     get_all_stocks_pend_request,
-    get_all_stocks_pend_out_request
+    get_all_stocks_pend_out_request,
+    add_check_list
 }
