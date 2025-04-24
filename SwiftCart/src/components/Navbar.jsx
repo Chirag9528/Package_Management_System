@@ -1,4 +1,4 @@
-import { ShoppingCart, Package, Home, LogIn, ChevronDown, User } from 'lucide-react';
+import { ShoppingCart, Package, Home, LogIn, ChevronDown, User, ArrowRight  } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import userContext from '../Context/userContext';
@@ -49,7 +49,7 @@ const Navbar = () => {
     .catch(error => console.log(error))
 
     if (response && response.success){
-        localStorage.removeItem('username')
+        localStorage.clear();
         console.log("successfully logged out")
         setShowUserOptions(false);
         setcurrUser(null);
@@ -79,12 +79,13 @@ const Navbar = () => {
             <span>Home</span>
           </Link>
 
-          <button 
-            onClick={handleMyOrders}
-          className="flex items-center gap-1 hover:text-blue-300 transition">
-            <ShoppingCart size={18} />
-            <span>My Orders</span>
-          </button>
+          {localStorage.getItem('role')==='customer' && <button 
+              onClick={handleMyOrders}
+            className="flex items-center gap-1 hover:text-blue-300 transition">
+              <ShoppingCart size={18} />
+              <span>My Orders</span>
+            </button>
+          }
 
           {!isLoggedIn ? (
             <>
@@ -117,6 +118,7 @@ const Navbar = () => {
                   >
                     Login as Manager
                   </Link>
+                  
                 </div>
               )}
             </>
@@ -133,6 +135,13 @@ const Navbar = () => {
 
               {showUserOptions && (
                 <div className="absolute top-full right-0 mt-2 w-48 bg-white text-black rounded shadow-lg z-10">
+                  <Link
+                    to="/profile"
+                    className="block w-full text-left px-4 py-2 hover:bg-slate-100"
+                    onClick={() => setShowUserOptions(false)}
+                  >
+                    View Profile
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 hover:bg-slate-100"
@@ -141,8 +150,17 @@ const Navbar = () => {
                   </button>
                 </div>
               )}
+
             </>
           )}
+
+          <Link
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-1 hover:text-blue-300 transition"
+          >
+            <ArrowRight size={20} />
+          </Link>
+        
         </div>
       </div>
     </nav>

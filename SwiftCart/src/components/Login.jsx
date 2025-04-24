@@ -43,6 +43,8 @@ const LoginPage = () => {
         
             if (response && response.success){
                 localStorage.setItem('username' , response.data.custInfo.first_name)
+                localStorage.setItem('id' , response.data.custInfo.customer_id)
+                localStorage.setItem('role' , type)
                 console.log("successfully login")
                 navigate('/customer/home')
             }
@@ -65,6 +67,8 @@ const LoginPage = () => {
         
             if (response && response.success){
                 localStorage.setItem('username' , response.data.employeeInfo.first_name)
+                localStorage.setItem('role' , type)
+                localStorage.setItem('id' , response.data.employeeInfo.person_id)
                 console.log("successfully login")
                 navigate('/employee/home')
             }
@@ -87,6 +91,7 @@ const LoginPage = () => {
         
             if (response && response.success){
                 localStorage.setItem('username' , response.data.managerInfo.first_name)
+                localStorage.setItem('role' , type)
                 localStorage.setItem('id' , response.data.managerInfo.person_id)
                 console.log("successfully login")
                 console.log(response)
@@ -100,9 +105,15 @@ const LoginPage = () => {
     } 
   };
 
-  const isCustomer = type === 'customer';
-  const title = isCustomer ? 'Customer' : 'Employee';
-
+  let title = '';
+  if (type === 'customer') {
+    title = 'Customer';
+  } else if (type === 'employee') {
+    title = 'Employee';
+  } else if (type === 'manager') {
+    title = 'Manager';
+  }
+  
   return (
     
         

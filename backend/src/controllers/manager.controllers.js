@@ -397,6 +397,26 @@ const reject_order = asyncHandler(async(req,res)=>{
         )
 })
 
+const get_all_profile_detail = asyncHandler(async(req,res)=>{
+    const managerId = req.query.id;
+    
+    if(!managerId ){
+        throw new ApiError(400, "Manager ID is required in query params.");
+    }
+
+    const data = await req.dbClient.query(
+        `SELECT * FROM person AS p
+            JOIN manager AS m ON m.person_id = p.person_id
+            WHERE p.person_id = $1;`,[managerId]
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200,data.rows,"all profile")
+        )
+})
+
 export {
     registerManager,
     loginManager,
@@ -408,5 +428,6 @@ export {
     get_all_stocks_pend_request,
     get_all_stocks_pend_out_request,
     add_check_list,
-    reject_order
+    reject_order,
+    get_all_profile_detail
 }

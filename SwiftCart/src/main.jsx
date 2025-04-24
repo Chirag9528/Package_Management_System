@@ -19,6 +19,7 @@ import MinimumStocks from './manager/MinimumStocks.jsx'
 import Process_Request from './manager/Process_Request.jsx'
 import PendingStocksRequests from './manager/PendingStocksRequest.jsx'
 import Posted_Stocks_Order from './manager/Posted_Stocks_Order.jsx'
+import Profile from './components/Profile.jsx'
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element : <HomePage/>
+      },
+      {
+        path: "/profile",
+        element: <Profile/>
       },
       {
         path: "/product",

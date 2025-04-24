@@ -147,10 +147,31 @@ const process_order = asyncHandler(async (req , res) => {
     )
 })
 
+const get_all_profile_detail = asyncHandler(async(req,res)=>{
+    const managerId = req.query.id;
+    
+    if(!managerId ){
+        throw new ApiError(400, "Manager ID is required in query params.");
+    }
+
+    const data = await req.dbClient.query(
+        `SELECT * FROM person AS p
+            JOIN employee AS m ON m.person_id = p.person_id
+            WHERE p.person_id = $1;`,[managerId]
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200,data.rows,"all profile")
+        )
+})
+
 export {
     loginEmployee,
     get_all_pending_requests,
     get_order_details,
     get_available_transport,
-    process_order
+    process_order,
+    get_all_profile_detail
 }

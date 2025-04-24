@@ -196,10 +196,30 @@ const get_my_orders = asyncHandler(async (req , res) => {
     ) 
 })
 
+const get_all_profile_detail = asyncHandler(async(req,res)=>{
+    const custId = req.query.id;
+    
+    if(!custId ){
+        throw new ApiError(400, "Manager ID is required in query params.");
+    }
+
+    const data = await req.dbClient.query(
+        `SELECT * FROM customer
+            WHERE customer_id = $1;`,[custId]
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200,data.rows,"all profile")
+        )
+})
+
 export {
     registerCustomer,
     loginCustomer,
     fetch_all_items,
     place_orders,
-    get_my_orders
+    get_my_orders,
+    get_all_profile_detail
 }
