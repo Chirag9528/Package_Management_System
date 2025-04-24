@@ -360,6 +360,43 @@ const add_check_list = asyncHandler(async(req,res)=>{
         )
 })
 
+const reject_order = asyncHandler(async(req,res)=>{
+    const managerId = req.query.managerId;
+    const fwid = req.query.fwid;
+    const item_id = req.query.itemId;
+
+    if(!managerId ){
+        throw new ApiError(400, "Manager ID is required in query params.");
+    }
+    // const result = await req.dbClient.query(
+    //     `SELECT warehouse_id FROM manager WHERE person_id = $1;`, [managerId]
+    // );        
+      
+    // const w_id = result.rows[0]?.warehouse_id;
+
+    const data = await req.dbClient.query(
+        `SELECT from_contain_id FROM pending_stock_request AS pd
+        JOIN contain AS c 
+        ON c.contain_id = pd.from_contain_id
+        WHERE c.w_house_id = $1 AND pd.item_id = $2;`,[fwid,item_id]
+    )
+
+    const fcd = data.rows[0];
+    if(!fcd){
+        console.log("no from contain id found\n");
+    }
+
+    const result = await req.dbClient.query(
+        `UPDATE pending_stock_request SET status = 'rejected' WHERE item_id = $1 AND from_contain_id = $2`,[item_id,fcd?.from_contain_id]
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200,result.rows,"Manager rejected stock to min stock")
+        )
+})
+
 export {
     registerManager,
     loginManager,
@@ -370,5 +407,6 @@ export {
     place_request,
     get_all_stocks_pend_request,
     get_all_stocks_pend_out_request,
-    add_check_list
+    add_check_list,
+    reject_order
 }

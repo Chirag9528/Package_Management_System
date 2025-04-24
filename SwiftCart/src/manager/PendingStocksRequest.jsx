@@ -4,6 +4,29 @@ const PendingStocksRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const handleAction = async(fwid,item_id)=>{
+    const id = localStorage.getItem('id');
+    const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/m/reject_order_request?managerId=${id}&fwid=${fwid}&itemId=${item_id}`,{
+      method: 'GET',
+      credentials: 'include'
+    })
+    .then(response => response.json())
+    .catch(err => console.log(err))
+
+    console.log(response)
+    if(response && response.success){
+      console.log("orderd has been rejected\n");
+      setRequests(prev =>
+        prev.filter(
+          req =>
+            !(req.from_warehouse_id === fwid && req.itm_id === item_id)
+        )
+      )
+    }
+    else{
+      console.log("rejection cancelled");
+    }
+  }
 
   useEffect(() => {
     const fetchPendingRequests = async () => {
@@ -33,32 +56,7 @@ const PendingStocksRequests = () => {
     fetchPendingRequests();
   }, []);
 
-  const handleAction = async (reqId, action) => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/m/handle_stock_request`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          requestId: reqId,
-          action, // "accept" or "reject"
-        }),
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        // Remove the handled request from state
-        setRequests((prev) => prev.filter((r) => r.req_id !== reqId));
-      } else {
-        console.error("Action failed:", result.message);
-      }
-    } catch (error) {
-      console.error("Error handling action:", error);
-    }
-  };
-
+  
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-60">
@@ -103,7 +101,7 @@ const PendingStocksRequests = () => {
                Accept
             </button>
             <button
-              onClick={() => handleAction(req.req_id, 'reject')}
+              onClick={() => handleAction(req.from_warehouse_id,req.itm_id)}
               className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-red-600"
             >
                Reject
