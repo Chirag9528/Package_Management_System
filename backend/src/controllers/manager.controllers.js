@@ -368,11 +368,6 @@ const reject_order = asyncHandler(async(req,res)=>{
     if(!managerId ){
         throw new ApiError(400, "Manager ID is required in query params.");
     }
-    // const result = await req.dbClient.query(
-    //     `SELECT warehouse_id FROM manager WHERE person_id = $1;`, [managerId]
-    // );        
-      
-    // const w_id = result.rows[0]?.warehouse_id;
 
     const data = await req.dbClient.query(
         `SELECT from_contain_id FROM pending_stock_request AS pd
@@ -417,6 +412,42 @@ const get_all_profile_detail = asyncHandler(async(req,res)=>{
         )
 })
 
+
+const get_available_transports = asyncHandler(async (req , res)=>{
+    const {w_house_id} = req.body
+
+    const manager_id = req.user.id
+
+    const transport_option = `SELECT * from search_available_transport($1 , $2);`;
+    const result = await req.dbClient.query(transport_option , [manager_id , w_house_id]);
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200 , result.rows , "Transport options fetched successfully")
+        )
+})
+
+
+const transport_item_to_destination_warehouse = asyncHandler(async (req , res) => {
+    const {transport_id , item_qty , item_id , dest_warehouse_id} = req.body;
+    const manager_id = req.user.id;
+
+    const transport_item = `select * from transport_item_to_destination_warehouse($1,$2,$3,$4,$5);`
+    const result = await req.dbClient.query(transport_item , 
+        [transport_id , item_qty , item_id , manager_id , dest_warehouse_id])
+    
+    if (!result){
+        throw new ApiError(500 , "Internal Server Error");
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200 , result.rows[0] , "Item Shipped Successfully to other warehouse")
+        )
+})
+
 export {
     registerManager,
     loginManager,
@@ -429,5 +460,7 @@ export {
     get_all_stocks_pend_out_request,
     add_check_list,
     reject_order,
-    get_all_profile_detail
+    get_all_profile_detail,
+    get_available_transports,
+    transport_item_to_destination_warehouse
 }
