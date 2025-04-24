@@ -17,7 +17,7 @@ const ProductCard = ({ product }) => {
     >
       <div className="h-48 bg-gray-200 relative overflow-hidden">
         <img 
-          src={import.meta.env.VITE_IMAGEURL} 
+          src={product.imageurl} 
           alt={product.name} 
           className={` object-cover transition-transform duration-300 ${isHovered ? 'scale-110' : 'scale-100'}`}
         />

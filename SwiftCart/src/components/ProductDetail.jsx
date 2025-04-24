@@ -57,7 +57,7 @@ const ProductDetail = ({ product}) => {
           {/* Product Image */}
           <div className="md:w-1/2 bg-gray-100 flex items-center justify-center p-6">
             <img 
-              src={product.imageUrl || import.meta.env.VITE_IMAGEURL} 
+              src={product.imageurl} 
               alt={product.name} 
               className="max-w-full max-h-96 object-contain"
             />
