@@ -133,9 +133,7 @@ const loginCustomer = asyncHandler(async (req , res) => {
 const fetch_all_items = asyncHandler(async (req , res) => {
 
     const result = await req.dbClient.query(`
-        SELECT item_id , i.name as name, price , i.description , ci.name as category
-        FROM item i JOIN category_item ci 
-        ON i.category_id = ci.category_id;`)
+        SELECT * FROM Show_All_Items;`)
         
     return res
     .status(200)
