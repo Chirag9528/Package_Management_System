@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser"
 const app = express();
 app.use(cors(
     {
-        origin : "https://package-management-system-frontend.vercel.app/",
+        origin : "https://package-management-system-frontend.vercel.app",
         credentials : true // will allow to send and receive cookies to cross origin
     }
 ))
