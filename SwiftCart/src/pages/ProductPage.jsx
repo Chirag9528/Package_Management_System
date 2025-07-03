@@ -8,6 +8,7 @@ const ProductPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      console.log(obj)
       <ProductDetail product={obj} />
     </div>
   );
