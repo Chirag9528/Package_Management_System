@@ -62,6 +62,8 @@ const registerCustomer = asyncHandler(async (req , res) => {
 
 
 const loginCustomer = asyncHandler(async (req , res) => {
+    console.log("login request: ",req.body.email);
+
     const {email , password} = req.body
     if (!email || !password){
         throw new ApiError(400 , "Email and Password is required");
@@ -69,7 +71,9 @@ const loginCustomer = asyncHandler(async (req , res) => {
     let user , custInfo;
 
     try {
+
         await req.dbClient.query('BEGIN');
+
         const result = await req.dbClient.query('SELECT * FROM users WHERE email = $1', [email])
     
         if (result.rowCount === 0) {
@@ -150,7 +154,7 @@ const place_orders = asyncHandler(async (req, res) => {
     const {itemId, itemQnty } = req.body;
     const email = req.user.email
     const customerId = req.user.id
-    console.log(customerId)
+    console.log('place order request')
 
     if (!itemId || !itemQnty || !email) {
         throw new ApiError(400, "Item Id and Item Quantity is required");
@@ -195,7 +199,8 @@ const get_my_orders = asyncHandler(async (req , res) => {
 })
 
 const get_all_profile_detail = asyncHandler(async(req,res)=>{
-    const custId = req.query.id;
+    console.log("profile info fetched")
+    const custId = req.body.id;
     
     if(!custId ){
         throw new ApiError(400, "Manager ID is required in query params.");
@@ -213,11 +218,32 @@ const get_all_profile_detail = asyncHandler(async(req,res)=>{
         )
 })
 
+const fetch_all_searching= asyncHandler( async (req,res ) =>{
+    const qq = req.query.q;
+   
+    const result = await req.dbClient.query(
+        `SELECT item_id, name FROM item WHERE name ILIKE $1 LIMIT 5`,
+            [`%${qq}%`]
+        );
+    
+    if(result.length<=0) {
+        return res
+                .status(200)
+                .json(new ApiResponse(200, [], "No items found"));
+    }
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200,result.rows,"all profile")
+        )
+})
+
 export {
     registerCustomer,
     loginCustomer,
     fetch_all_items,
     place_orders,
     get_my_orders,
-    get_all_profile_detail
+    get_all_profile_detail,
+    fetch_all_searching,
 }

@@ -1,79 +1,9 @@
 import { useState, useEffect } from 'react';
 import OrdersList from '../components/OrdersList';
+import { useContext } from 'react';
+import userContext from '../Context/userContext';
 
 // Mock data structure that matches your database schema
-const mockOrders = [
-  {
-    order_id: 1001,
-    customer_id: 101,
-    item_id: 201,
-    order_date: "2025-04-15",
-    status: "delivered",
-    return_date: null,
-    delivered_date: "2025-04-17",
-    ordered_qty: 1,
-    // Additional item info from JOIN
-    item_name: "Premium Wireless Headphones",
-    item_price: 129.99,
-    item_image: null
-  },
-  {
-    order_id: 1002,
-    customer_id: 101,
-    item_id: 202,
-    order_date: "2025-04-10",
-    status: "shipped",
-    return_date: null,
-    delivered_date: null,
-    ordered_qty: 2,
-    // Additional item info from JOIN
-    item_name: "Cotton T-Shirt - Black",
-    item_price: 19.99,
-    item_image: null
-  },
-  {
-    order_id: 1003,
-    customer_id: 101,
-    item_id: 203,
-    order_date: "2025-04-10",
-    status: "shipped",
-    return_date: null,
-    delivered_date: null,
-    ordered_qty: 1,
-    // Additional item info from JOIN
-    item_name: "Athletic Socks Pack",
-    item_price: 12.99,
-    item_image: null
-  },
-  {
-    order_id: 1004,
-    customer_id: 101,
-    item_id: 204,
-    order_date: "2025-04-05",
-    status: "cancelled",
-    return_date: null,
-    delivered_date: null,
-    ordered_qty: 1,
-    // Additional item info from JOIN
-    item_name: "Smartphone Case",
-    item_price: 24.99,
-    item_image: null
-  },
-  {
-    order_id: 1005,
-    customer_id: 101,
-    item_id: 205,
-    order_date: "2025-03-28",
-    status: "returned",
-    return_date: "2025-04-05",
-    delivered_date: "2025-04-01",
-    ordered_qty: 1,
-    // Additional item info from JOIN
-    item_name: "Running Shoes - Size 10",
-    item_price: 89.99,
-    item_image: null
-  }
-];
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
@@ -81,12 +11,20 @@ const OrdersPage = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
+  const {role} = useContext(userContext)
   
   useEffect(() => {
     const fetchOrders = async () => {
       const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/c/get_my_orders`,{
-          method : 'GET',
-          credentials : 'include'
+          method : 'POST',
+          credentials : 'include',
+          headers: {
+            'Content-type': 'Application/json'
+          },
+          body: JSON.stringify({
+            role:role
+          })
       })
       .then(response => response.json())
       .catch(error => console.log(error))

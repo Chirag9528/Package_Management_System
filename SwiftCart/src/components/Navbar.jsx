@@ -14,27 +14,10 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const {currUser,setcurrUser} = useContext(userContext);
+  const {currUser,setcurrUser, role} = useContext(userContext);
   const isLoggedIn = !!currUser;
 
-  useEffect(()=>{
-    const checkuser = async ()=>{
-      console.log(import.meta.env.VITE_HOSTNAME)
-      const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/u/verify-accessToken`,{
-        method: 'POST', 
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json", 
-        }
-      })
-      .then(response => response.json())
-      .catch(error => console.log(error))
-      if (response && response.success){
-        setcurrUser(response.data.email)
-      }
-    }
-    checkuser();
-  })
+
 
   // Re-run on every route change
   useEffect(() => {
@@ -51,7 +34,6 @@ const Navbar = () => {
     }
 
     try {
-      // console.log("just before ",query)
       const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/c/get_all_searching?q=${query}`, {
         method: 'GET',
         credentials: 'include'
@@ -91,7 +73,10 @@ const Navbar = () => {
       credentials: "include",
       headers: {
           "Content-Type": "application/json", 
-      }
+      },
+      body: JSON.stringify({
+        role:role
+      })
     })
     .then(response => response.json())
     .catch(error => console.log(error))

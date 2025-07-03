@@ -1,13 +1,12 @@
 import { useContext, useState } from 'react';
 import { ShoppingCart, Star, TruckIcon, Shield, ArrowLeft } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import userContext from '../Context/userContext';
 
 const ProductDetail = ({ product}) => {
-  console.log(product);
+  // console.log(product);
   const [quantity, setQuantity] = useState(1);
-  const navigate = useNavigate();
-  const {currUser} = useContext(userContext);
+  const {currUser, role} = useContext(userContext);
 
   const placeOrder = () =>{
     console.log(product)
@@ -15,7 +14,7 @@ const ProductDetail = ({ product}) => {
       alert("Please Login to order item")
       return 0;
     }
-    console.log("welcome -- ",currUser);
+
     console.log(currUser,product.item_id,quantity);
     const placeOrder = async ()=>{
       const response = await fetch(`${import.meta.env.VITE_HOSTNAME}/api/c/place_orders`,{
@@ -26,7 +25,8 @@ const ProductDetail = ({ product}) => {
         },
         body:  JSON.stringify({
           itemId: product.item_id,
-          itemQnty: quantity
+          itemQnty: quantity,
+          role: role
         })
         
       })

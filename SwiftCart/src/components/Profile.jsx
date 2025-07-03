@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useContext } from 'react';
+import userContext from '../Context/userContext';
 
 const Profile = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const {role} = useContext(userContext)
 
   const userId = localStorage.getItem('id');
   const userType = localStorage.getItem('role'); // 'customer', 'employee', or 'manager'
@@ -24,12 +27,19 @@ const Profile = () => {
     setLoading(true);
     setError(null);
     try {
-        console.log(typeMap[userType],userType,userId)
+
       const response = await fetch(
-        `${import.meta.env.VITE_HOSTNAME}/api/${typeMap[userType]}/get_profile?id=${userId}`,
+        `${import.meta.env.VITE_HOSTNAME}/api/${typeMap[userType]}/get_profile`,
         {
-          method: 'GET',
+          method: 'POST',
+          headers: {
+            'Content-type': 'Application/json'
+          },
           credentials: 'include',
+          body: JSON.stringify({
+            id: userId,
+            role: role
+          })
         }
       );
 

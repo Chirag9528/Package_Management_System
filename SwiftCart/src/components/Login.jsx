@@ -8,7 +8,7 @@ const LoginPage = () => {
   const [error,seterror] = useState('');
   const navigate = useNavigate();
 
-  const {setcurrUser} = useContext(userContext);
+  const {setcurrUser, setrole} = useContext(userContext);
 
   const handleChange = e => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,7 +16,6 @@ const LoginPage = () => {
 
   const handleSubmit = async (e)  => {
     e.preventDefault();
-    console.log(`Logging in as ${type}`, formData);
 
     if(!formData.email || !formData.password){
         console.log(error)
@@ -24,7 +23,7 @@ const LoginPage = () => {
     }
 
     try {
-        
+
         seterror('');
         if(type === 'customer') {
             setcurrUser(formData.email)
@@ -36,13 +35,16 @@ const LoginPage = () => {
                 },
                 body: JSON.stringify({
                     email: formData.email,
-                    password: formData.password
+                    password: formData.password,
+                    role: 'customer'
+                    
                 })
             })
             .then(response => response.json())
             .catch(error => console.log(error))
         
             if (response && response.success){
+                setrole(()=>('customer'))
                 localStorage.setItem('username' , response.data.custInfo.first_name)
                 localStorage.setItem('id' , response.data.custInfo.customer_id)
                 localStorage.setItem('role' , type)
@@ -60,13 +62,17 @@ const LoginPage = () => {
                 },
                 body: JSON.stringify({
                     email: formData.email,
-                    password: formData.password
+                    password: formData.password,
+                   
+                    role: 'employee'
+                    
                 })
             })
             .then(response => response.json())
             .catch(error => console.log(error))
         
             if (response && response.success){
+                setrole(()=>('employee'))
                 localStorage.setItem('username' , response.data.employeeInfo.first_name)
                 localStorage.setItem('role' , type)
                 localStorage.setItem('id' , response.data.employeeInfo.person_id)
@@ -84,13 +90,17 @@ const LoginPage = () => {
                 },
                 body: JSON.stringify({
                     email: formData.email,
-                    password: formData.password
+                    password: formData.password,
+                    
+                    role: 'manager'
+                    
                 })
             })
             .then(response => response.json())
             .catch(error => console.log(error))
         
             if (response && response.success){
+                setrole(()=>('manager'))
                 localStorage.setItem('username' , response.data.managerInfo.first_name)
                 localStorage.setItem('role' , type)
                 localStorage.setItem('id' , response.data.managerInfo.person_id)
